@@ -4,11 +4,12 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
-
+    private static int valueX;
+    private static int valueY;
     private static final int WIN_COUNT = 4;
     private static final char DOT_HUMAN = 'X'; // ход игрока
     private static final char DOT_AI = 'O'; // ход компьютера
-    private static final char DOT0_EMPTY = '*'; // пустое поле
+    private static final char DOT0_EMPTY = ' '; // пустое поле
     private static Scanner scanner; // создаем объект типа сканер
 
     /**
@@ -91,7 +92,7 @@ public class Main {
      * @return состояние игры (true - игра завершена, false - продолжается)
      */
     static boolean checkGame(char c, String string) {
-        if (checkWin(c)) {
+        if (checkWinNew(c, valueX, valueY, WIN_COUNT)) {
             System.out.println(string);
             return true;
         }
@@ -125,8 +126,102 @@ public class Main {
         return false;
     }
 
-    static boolean checkWinNew(char c, int x, int y, int WIN_COUNT){
-        return true;
+    /**
+     * Метод работает таким образом, что в качестве аргументов принимает фишку игрока, координаты его хода (Х и У)
+     * и количество совпадений для выигрыша.
+     * Получая координаты хода, метод проверяет наличие таких фишек по горизонтали в право, запоминает, потом проверяет
+     * влево, запоминает. Если данного количества хватает для выигрыша - выдает соответствующий результат. Если нет -
+     * обнуляет данные и проверяет аналогично по вертикали и диагоналям.
+     * P.S. На семинаре предлагалось сделать так, чтобы была проверка каждой ячейки вправо, влево и диагональ - при
+     * таком подходе, нам не нужно было бы передавать в метод координаты хода => в связи с этим, метод сделал согласно
+     * своему первичному видению :-)
+     * @param c Фишка игрока
+     * @param a Координата по Х
+     * @param b Координата по У
+     * @param WIN_COUNT Количество фишек для выигрыша
+     * @return выводит результат
+     */
+    static boolean checkWinNew(char c, int a, int b, int WIN_COUNT){
+        int count = 0;
+        // Проверка по горизонтали
+        for (int y = b; y < fieldSizeY; y++){
+            if (field[a][y] == c) {
+                count++;
+            } else {
+                break;
+            }
+        }
+        for (int y = b - 1; y >= 0; y--) {
+            if (field[a][y] == c) {
+                count++;
+            } else {
+                break;
+            }
+        }
+        if (WIN_COUNT - count <= 0) return true;
+        count = 0;
+        // Проверка по вертикали
+        for (int x = a; x < fieldSizeX; x++) {
+            if (field[x][b] == c) {
+                count++;
+            } else {
+                break;
+            }
+        }
+        for (int x = a - 1; x >= 0; x--) {
+            if (field[x][b] == c) {
+                count++;
+            } else {
+                break;
+            }
+        }
+        if (WIN_COUNT - count <= 0) return true;
+        count = 0;
+        // Проверка по диагонали
+        int temp = b;
+        for (int x = a; x < fieldSizeX; x++) {
+            if (field[x][temp] == c) {
+                count++;
+                if (temp < fieldSizeY - 1) temp++;
+            } else {
+                break;
+            }
+        }
+        temp = b;
+        for (int x = a - 1; x >= 0; x--) {
+            if (temp > 0) {
+                temp--;
+                if (field[x][temp] == c) {
+                    count++;
+                } else {
+                    break;
+                }
+            }
+        }
+        if (WIN_COUNT - count <= 0) return true;
+        count = 0;
+        temp = b;
+        for (int x = a; x < fieldSizeX; x++) {
+            if (field[x][temp] == c) {
+                count++;
+                if (temp > 0) temp--;
+            } else {
+                break;
+            }
+        }
+        temp = b;
+        for (int x = a - 1; x >= 0; x--) {
+            if (temp < fieldSizeY - 1) {
+                temp++;
+                if (field[x][temp] == c) {
+                    count++;
+                } else {
+                    break;
+                }
+            }
+        }
+        if (WIN_COUNT - count <= 0) return true;
+        return false;
     }
 
     /**
@@ -155,6 +250,8 @@ public class Main {
 // Составное условие - сперва проверяем границы игрового поля, и только потом на свободную ячейку
 // в обратном случае, если ячейка не в границах поля, она всегда будет свободной, выпадет Exception
         field[x][y] = DOT_HUMAN;
+        valueX = x;
+        valueY = y;
     }
 
     /**
@@ -168,6 +265,8 @@ public class Main {
             y = random.nextInt(fieldSizeY);
         } while (!isCellEmpty(x, y));
         field[x][y] = DOT_AI;
+        valueX = x;
+        valueY = y;
     }
 
     /**
