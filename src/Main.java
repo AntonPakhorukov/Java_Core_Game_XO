@@ -30,8 +30,8 @@ public class Main {
     public static void main(String[] args) {
         while (true) {
             initialize();
+            printField();
             while (true) {
-                printField();
                 humanTurn();
                 printField();
                 if (checkGame(DOT_HUMAN, "Вы победили!!!"))
@@ -142,85 +142,15 @@ public class Main {
      * @return выводит результат
      */
     static boolean checkWinNew(char c, int a, int b, int WIN_COUNT){
-        int count = 0;
+        //int count = 0;
         // Проверка по горизонтали
-        for (int y = b; y < fieldSizeY; y++){
-            if (field[a][y] == c) {
-                count++;
-            } else {
-                break;
-            }
-        }
-        for (int y = b - 1; y >= 0; y--) {
-            if (field[a][y] == c) {
-                count++;
-            } else {
-                break;
-            }
-        }
-        if (WIN_COUNT - count <= 0) return true;
-        count = 0;
+        if (Methods.checkHorizontal(c, valueX, valueY, WIN_COUNT, fieldSizeY, field)) return true;
         // Проверка по вертикали
-        for (int x = a; x < fieldSizeX; x++) {
-            if (field[x][b] == c) {
-                count++;
-            } else {
-                break;
-            }
-        }
-        for (int x = a - 1; x >= 0; x--) {
-            if (field[x][b] == c) {
-                count++;
-            } else {
-                break;
-            }
-        }
-        if (WIN_COUNT - count <= 0) return true;
-        count = 0;
-        // Проверка по диагонали
-        int temp = b;
-        for (int x = a; x < fieldSizeX; x++) {
-            if (field[x][temp] == c) {
-                count++;
-                if (temp < fieldSizeY - 1) temp++;
-            } else {
-                break;
-            }
-        }
-        temp = b;
-        for (int x = a - 1; x >= 0; x--) {
-            if (temp > 0) {
-                temp--;
-                if (field[x][temp] == c) {
-                    count++;
-                } else {
-                    break;
-                }
-            }
-        }
-        if (WIN_COUNT - count <= 0) return true;
-        count = 0;
-        temp = b;
-        for (int x = a; x < fieldSizeX; x++) {
-            if (field[x][temp] == c) {
-                count++;
-                if (temp > 0) temp--;
-            } else {
-                break;
-            }
-        }
-        temp = b;
-        for (int x = a - 1; x >= 0; x--) {
-            if (temp < fieldSizeY - 1) {
-                temp++;
-                if (field[x][temp] == c) {
-                    count++;
-                } else {
-                    break;
-                }
-            }
-        }
-        if (WIN_COUNT - count <= 0) return true;
+        if (Methods.checkVertical(c, valueX, valueY, WIN_COUNT, fieldSizeX, field)) return true;
+        // Проверка по диагонали (x+/y+)
+        if (Methods.checkVerticalRL(c, valueX, valueY, WIN_COUNT, fieldSizeX, fieldSizeY, field)) return true;
+        // Проверка по диагонали (x-/y+)
+        if (Methods.checkVerticalLR(c, valueX, valueY, WIN_COUNT, fieldSizeX, fieldSizeY, field)) return true;
         return false;
     }
 
