@@ -9,7 +9,7 @@ public class Main {
     private static final int WIN_COUNT = 4;
     private static final char DOT_HUMAN = 'X'; // ход игрока
     private static final char DOT_AI = 'O'; // ход компьютера
-    private static final char DOT0_EMPTY = ' '; // пустое поле
+    private static final char DOT0_EMPTY = '*'; // пустое поле
     private static Scanner scanner; // создаем объект типа сканер
 
     /**
@@ -36,7 +36,7 @@ public class Main {
                 printField();
                 if (checkGame(DOT_HUMAN, "Вы победили!!!"))
                     break;
-                aiTurn();
+                aiTurnHard();
                 printField();
                 if (checkGame(DOT_AI, "Победил компьютер!"))
                     break;
@@ -197,6 +197,67 @@ public class Main {
         field[x][y] = DOT_AI;
         valueX = x;
         valueY = y;
+    }
+
+    /**
+     * Метод работает следующим образом: есть флаг, который проверяет, нашлась ли ячейка,
+     * сделав ход в которую, игрок победит. Циклом перебираем каждую ячейку, если она пустая, пробуем в неё
+     * подставить фишку игрока и проверяем на выигрыш. Если будет победа, то в эту ячейку AI ставит свою фишку
+     * фиксируем координаты AI, меняем флаг - ячейка нашлась, и выходим из цикла.
+     * Если ячейка не нашлась, то рандомно ставим любую.
+     * Учитывая задание, сделать так, чтобы AI мешал игроку - этого достаточно думаю))
+     */
+    private static void aiTurnHard(){
+        int a, b;
+        boolean checkTurn = false;
+        char gamer = 'X';
+        for (int x = 0; x < fieldSizeX; x++) {
+            if (checkTurn) break;
+            for (int y = 0; y < fieldSizeY; y++) {
+                if (checkTurn) break;
+                if (field[x][y] == DOT0_EMPTY) {
+                    field[x][y] = gamer;
+                    if (Methods.checkHorizontal(gamer, valueX, valueY, WIN_COUNT, fieldSizeY, field)) {
+                        field[x][y] = DOT_AI;
+                        valueX = x;
+                        valueY = y;
+                        checkTurn = true;
+                        break;
+                    }
+                    if (Methods.checkVertical(gamer, valueX, valueY, WIN_COUNT, fieldSizeX, field)) {
+                        field[x][y] = DOT_AI;
+                        checkTurn = true;
+                        valueX = x;
+                        valueY = y;
+                        break;
+                    }
+                    if (Methods.checkVerticalRL(gamer, valueX, valueY, WIN_COUNT, fieldSizeX, fieldSizeY, field)) {
+                        field[x][y] = DOT_AI;
+                        checkTurn = true;
+                        valueX = x;
+                        valueY = y;
+                        break;
+                    }
+                    if (Methods.checkVerticalLR(gamer, valueX, valueY, WIN_COUNT, fieldSizeX, fieldSizeY, field)) {
+                        field[x][y] = DOT_AI;
+                        checkTurn = true;
+                        valueX = x;
+                        valueY = y;
+                        break;
+                    }
+                    field[x][y] = DOT0_EMPTY;
+                }
+            }
+        }
+        if (!checkTurn) {
+            do {
+                a = random.nextInt(fieldSizeX);
+                b = random.nextInt(fieldSizeY);
+            } while (!isCellEmpty(a, b));
+            field[a][b] = DOT_AI;
+            valueX = a;
+            valueY = b;
+        }
     }
 
     /**
